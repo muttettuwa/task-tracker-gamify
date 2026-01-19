@@ -23,13 +23,17 @@ class Task {
       medium: 1.5,
       high: 2.0
     };
-    return Math.floor(difficultyPoints[this.difficulty] * priorityMultiplier[this.priority]);
+    const basePoints = difficultyPoints[this.difficulty] || 20;
+    const multiplier = priorityMultiplier[this.priority] || 1.5;
+    return Math.floor(basePoints * multiplier);
   }
 
   updateStatus(newStatus) {
     this.status = newStatus;
     if (newStatus === 'completed') {
       this.completedAt = new Date();
+    } else {
+      this.completedAt = null;
     }
   }
 }
