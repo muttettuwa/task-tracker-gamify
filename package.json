@@ -1,0 +1,20 @@
+{
+  "name": "task-tracker-gamify",
+  "version": "1.0.0",
+  "description": "Task Tracking & Gamification Backend Service",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test"
+  },
+  "keywords": ["task-tracker", "gamification", "backend"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
