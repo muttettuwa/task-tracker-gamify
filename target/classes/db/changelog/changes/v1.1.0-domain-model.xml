@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- Create Organizations Table -->
+    <changeSet id="1.1.0-1" author="system">
+        <comment>Create organizations table</comment>
+
+        <createTable tableName="organizations">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="organizations" indexName="idx_organization_code">
+            <column name="code"/>
+        </createIndex>
+
+        <createIndex tableName="organizations" indexName="idx_organization_active">
+            <column name="is_active"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Create System Roles Table -->
+    <changeSet id="1.1.0-2" author="system">
+        <comment>Create system_roles table</comment>
+
+        <createTable tableName="system_roles">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="system_roles" indexName="idx_system_role_code">
+            <column name="code"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Create User Info Table -->
+    <changeSet id="1.1.0-3" author="system">
+        <comment>Create user_info table</comment>
+
+        <createTable tableName="user_info">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="middle_name" type="VARCHAR(100)"/>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birthday" type="DATE"/>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="telephone" type="VARCHAR(20)"/>
+            <column name="password_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registered_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="system_inserted_ts" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="system_updated_ts" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="logically_deleted" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Add foreign key constraint -->
+        <addForeignKeyConstraint
+                constraintName="fk_user_info_organization"
+                baseTableName="user_info"
+                baseColumnNames="organization_id"
+                referencedTableName="organizations"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"
+                onUpdate="CASCADE"/>
+
+        <!-- Create indexes -->
+        <createIndex tableName="user_info" indexName="idx_user_email">
+            <column name="email"/>
+        </createIndex>
+
+        <createIndex tableName="user_info" indexName="idx_user_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="user_info" indexName="idx_user_organization">
+            <column name="organization_id"/>
+        </createIndex>
+
+        <createIndex tableName="user_info" indexName="idx_user_logically_deleted">
+            <column name="logically_deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Create User Roles Table -->
+    <changeSet id="1.1.0-4" author="system">
+        <comment>Create user_roles table</comment>
+
+        <createTable tableName="user_roles">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_info_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="system_role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="system_inserted_ts" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="system_updated_ts" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="logically_deleted" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Add foreign key constraints -->
+        <addForeignKeyConstraint
+                constraintName="fk_user_role_user_info"
+                baseTableName="user_roles"
+                baseColumnNames="user_info_id"
+                referencedTableName="user_info"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"
+                onUpdate="CASCADE"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_user_role_organization"
+                baseTableName="user_roles"
+                baseColumnNames="organization_id"
+                referencedTableName="organizations"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"
+                onUpdate="CASCADE"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_user_role_system_role"
+                baseTableName="user_roles"
+                baseColumnNames="system_role_id"
+                referencedTableName="system_roles"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"
+                onUpdate="CASCADE"/>
+
+        <!-- Create indexes -->
+        <createIndex tableName="user_roles" indexName="idx_user_role_user">
+            <column name="user_info_id"/>
+        </createIndex>
+
+        <createIndex tableName="user_roles" indexName="idx_user_role_organization">
+            <column name="organization_id"/>
+        </createIndex>
+
+        <createIndex tableName="user_roles" indexName="idx_user_role_system_role">
+            <column name="system_role_id"/>
+        </createIndex>
+
+        <createIndex tableName="user_roles" indexName="idx_user_role_active">
+            <column name="active"/>
+        </createIndex>
+
+        <!-- Create unique constraint for user-organization-role combination -->
+        <addUniqueConstraint
+                tableName="user_roles"
+                columnNames="user_info_id, organization_id, system_role_id"
+                constraintName="uk_user_org_role"/>
+    </changeSet>
+
+    <!-- Insert Default System Roles -->
+    <changeSet id="1.1.0-5" author="system">
+        <comment>Insert default system roles</comment>
+
+        <insert tableName="system_roles">
+            <column name="code" value="SUPER_ADMIN"/>
+            <column name="description" value="Super Administrator - Full system access"/>
+        </insert>
+
+        <insert tableName="system_roles">
+            <column name="code" value="SUPERVISOR"/>
+            <column name="description" value="Supervisor - Manage organization users and tasks"/>
+        </insert>
+
+        <insert tableName="system_roles">
+            <column name="code" value="USER"/>
+            <column name="description" value="Regular User - Standard task management"/>
+        </insert>
+
+        <insert tableName="system_roles">
+            <column name="code" value="GUEST"/>
+            <column name="description" value="Guest - Read-only access"/>
+        </insert>
+    </changeSet>
+
+    <!-- Tag the database -->
+    <changeSet id="1.1.0-6" author="system">
+        <tagDatabase tag="v1.1.0-domain-model"/>
+    </changeSet>
+
+</databaseChangeLog>

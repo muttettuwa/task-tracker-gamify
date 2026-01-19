@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- Create user_approval table -->
+    <changeSet id="1.2.0-create-user-approval-table" author="developer">
+        <createTable tableName="user_approval">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_info_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_details" type="VARCHAR(500)"/>
+            <column name="approved_by" type="BIGINT"/>
+            <column name="approved_at" type="TIMESTAMP"/>
+            <column name="approval_notes" type="VARCHAR(500)"/>
+            <column name="system_inserted_ts" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="system_updated_ts" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="logically_deleted" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Add foreign key constraints -->
+    <changeSet id="1.2.0-add-user-approval-fk" author="developer">
+        <addForeignKeyConstraint
+                baseTableName="user_approval"
+                baseColumnNames="user_info_id"
+                constraintName="fk_user_approval_user_info"
+                referencedTableName="user_info"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="user_approval"
+                baseColumnNames="organization_id"
+                constraintName="fk_user_approval_organization"
+                referencedTableName="organization"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="user_approval"
+                baseColumnNames="approved_by"
+                constraintName="fk_user_approval_approved_by"
+                referencedTableName="user_info"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Create indexes for better query performance -->
+    <changeSet id="1.2.0-create-user-approval-indexes" author="developer">
+        <createIndex tableName="user_approval" indexName="idx_user_approval_user_info">
+            <column name="user_info_id"/>
+        </createIndex>
+
+        <createIndex tableName="user_approval" indexName="idx_user_approval_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="user_approval" indexName="idx_user_approval_type_status">
+            <column name="type"/>
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Add comments for documentation -->
+    <changeSet id="1.2.0-add-user-approval-comments" author="developer">
+        <setTableRemarks tableName="user_approval"
+                         remarks="Tracks approval workflows for user actions (registration, role changes, etc.)"/>
+
+        <setColumnRemarks tableName="user_approval" columnName="type"
+                          remarks="Type of approval: REGISTRATION, ROLE_CHANGE, PERMISSION_REQUEST, etc."/>
+
+        <setColumnRemarks tableName="user_approval" columnName="status"
+                          remarks="Approval status: PENDING, APPROVED, REJECTED, CANCELLED"/>
+    </changeSet>
+
+</databaseChangeLog>
