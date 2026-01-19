@@ -38,13 +38,12 @@ class UserService {
 
   updateUserPoints(userId, points) {
     const user = this.getUser(userId);
-    const leveledUp = user.updateLevel();
     user.addPoints(points);
     
     // Check for achievements
     this.checkAchievements(user);
     
-    return { user, leveledUp };
+    return { user };
   }
 
   checkAchievements(user) {
